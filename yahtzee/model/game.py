@@ -312,12 +312,17 @@ class Turn:
         if self.state != Turn.PLAYING:
             raise Exception("You don't have any more rolls")
 
-        if dice_number in self.current_roll:
-            self.slots.append(dice_number)
-            self.current_roll.remove(dice_number)
-            logging.info("Player %s held dice number %i in a free slot." % (self.player.name, dice_number))
+        dice_choice = utils.is_numeric(dice_number)
+
+        if dice_choice is None or dice_choice < 1 or dice_choice > 6:
+            raise Exception("{0} is not a valid dice number.  Must be between 1 and 6.".format(dice_number))
+
+        if dice_choice in self.current_roll:
+            self.slots.append(dice_choice)
+            self.current_roll.remove(dice_choice)
+            logging.info("Player %s held dice number %i in a free slot." % (self.player.name, dice_choice))
         else:
-            raise Exception("Dice value {0} not in current roll {1}".format(dice_number, self.current_roll))
+            raise Exception("Dice value {0} not in current roll {1}".format(dice_choice, self.current_roll))
 
     def hold_all(self):
         if self.state != Turn.PLAYING:
@@ -327,12 +332,21 @@ class Turn:
             self.hold(dice_number)
 
     def unhold(self, dice_number : int):
-        if dice_number in self.slots:
-            self.slots.remove(dice_number)
-            self.current_roll.append(dice_number)
-            logging.info("Player %s removed dice number %i from a slot." % (self.player.name, dice_number))
+
+        if self.state != Turn.PLAYING:
+            raise Exception("You don't have any more rolls")
+
+        dice_choice = utils.is_numeric(dice_number)
+
+        if dice_choice is None or dice_choice < 1 or dice_choice > 6:
+            raise Exception("{0} is not a valid dice number.  Must be between 1 and 6.".format(dice_number))
+
+        if dice_choice in self.slots:
+            self.slots.remove(dice_choice)
+            self.current_roll.append(dice_choice)
+            logging.info("Player %s removed dice number %i from a slot." % (self.player.name, dice_choice))
         else:
-            raise Exception("Dice value {0} not held in slots {1}".format(dice_number, self.slots))
+            raise Exception("Dice value {0} not held in slots {1}".format(dice_choice, self.slots))
 
     def end(self):
         logging.info("Player %s has ended their turn" % self.player.name)

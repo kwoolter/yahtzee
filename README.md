@@ -4,6 +4,7 @@
 <h2>Getting Started</h2>
 <p>
 Run "run.py" to start the game.<br>
+Type "help" to find out the commands<br>
 Rules of Yahtzee can be found <a href=http://www.yahtzee.org.uk/rules.html>here.</a><br>
 Colours work if the game is run inside PyCharm IDE.<br>
 </p>

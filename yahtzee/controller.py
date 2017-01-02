@@ -57,17 +57,20 @@ class GameCLI(cmd.Cmd):
             print(str(err))
 
     def do_hold(self, args):
-        """hold [number] - The current player holds the specified rolled number e.g. 'hold 6'.  You can also use 'hold all'."""
+        """hold number1 [number2 number3] - The current player holds the specified rolled number(s) e.g. 'hold 1 6'.  You can also use 'hold all'."""
         try:
             if args=="all":
                 self.game.hold_all()
             else:
-                if len(args) >= 1 and utils.is_numeric(args) is not None:
-                    choice = utils.is_numeric(args)
+                if len(args) >= 1:
+                    for arg in args.split():
+                        try:
+                            self.game.hold(arg)
+                        except Exception as err:
+                            print(str(err))
                 else:
                     choice = utils.pick("Dice", self.game.current_turn.current_roll, auto_pick=True)
-
-                self.game.hold(choice)
+                    self.game.hold(choice)
 
             self.turn_view.print()
 
@@ -75,14 +78,19 @@ class GameCLI(cmd.Cmd):
             print(str(err))
 
     def do_unhold(self, args):
-        """unhold [number] - The current player unholds the specified held number e.g. 'unhold 3'."""
+        """unhold number1 [number2 number3] - The current player unholds the specified held number(s) e.g. 'unhold 3 6'."""
         try:
-            if len(args) >= 1 and utils.is_numeric(args) is not None:
-                choice = utils.is_numeric(args)
+            if len(args) >= 1:
+                for arg in args.split():
+                    try:
+                        self.game.unhold(arg)
+                    except Exception as err:
+                        print(str(err))
+
             else:
                 choice = utils.pick("Dice", self.game.current_turn.slots, auto_pick=True)
+                self.game.unhold(choice)
 
-            self.game.unhold(choice)
             self.turn_view.print()
 
         except Exception as err:
