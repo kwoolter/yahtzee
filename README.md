@@ -1,4 +1,3 @@
-# yahtzee
 <html>
 <body>
 <h1>Welcome to PyYahtzee</h1>
