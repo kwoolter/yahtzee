@@ -7,6 +7,7 @@ Run "run.py" to start the game.<br>
 Type "help" to find out the commands<br>
 Rules of Yahtzee can be found <a href=http://www.yahtzee.org.uk/rules.html>here.</a><br>
 Colours work if the game is run inside PyCharm IDE.<br>
+A high score table is saved as "PyYahtzee.hst"<br>
 </p>
 <h2>Structure</h2>
 <p>The game is structured using the <strong>Model-View-Controller</strong> paradigm<p>
@@ -15,5 +16,6 @@ Colours work if the game is run inside PyCharm IDE.<br>
 <li><strong>View</strong> - the "game_text_view.py" file in the "view" module holds the classes that display various aspects of the game e.g.the scorecard, the dice</li>
 <li><strong>Controller</strong> - the "controller.py" file has the CLI to play the game using the cmd module</li>
 </ul>
+<p>The "utils" module has various utilities that are used by the game e.g. HighScoreTable, is_numeric(), pick(), confirm()</p>
 </body>
 </html>
