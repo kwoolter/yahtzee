@@ -132,7 +132,7 @@ class GameCLI(cmd.Cmd):
         utils.type("\nG A M E  O V E R\n\n...and the winners are....\n\n")
         self.game.end()
         for player in self.game.winners:
-            print("{0} with a acore of {1}.".format(player.name, self.game.winning_score))
+            print("{0} with a score of {1}.".format(player.name, self.game.winning_score))
         utils.type("\nC O N G R A T U L A T I O N S\n\n\n")
         self.view.print()
         self.game.hst.print()
