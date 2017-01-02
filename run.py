@@ -1,0 +1,4 @@
+
+import yahtzee
+
+yahtzee.main()
