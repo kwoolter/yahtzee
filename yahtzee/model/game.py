@@ -373,11 +373,11 @@ class Turn:
             scores[Scores.YAHTZEE] = Scores.scores_to_points[Scores.YAHTZEE]
 
         # 4 of a kind..
-        if 4 in number_counts:
+        if max(number_counts) >= 4:
             scores[Scores.FOUR_OF_A_KIND] = sum(all_dice)
 
         # 3 of a kind...
-        if 3 in number_counts or 4 in number_counts:
+        if max(number_counts) >= 3:
             scores[Scores.THREE_OF_A_KIND] = sum(all_dice)
 
         # or a full house
