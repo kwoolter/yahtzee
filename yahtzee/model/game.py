@@ -354,12 +354,14 @@ class Turn:
 
     def score(self):
 
+        # Create a list of all possible types of score
         scores = Scores.blank_score_sheet()
 
         # Find the possible scores of all dice
         all_dice = self.slots + self.current_roll
 
-        # First calculate the basic number scores
+        # First calculate the basic number scores and build a list of the number of occurrences of each number
+        # at the same time for use later on e.g. (1,3,3,6,6) -> (1,0,2,0,0,2)
         number_counts = []
         for i in range(1,7):
             number_counts.append(all_dice.count(i))
@@ -387,21 +389,30 @@ class Turn:
         # Now look for runs....
         sequential = 0
         max_sequential = sequential
+
+        # Go through each number in sequence
         for number in number_counts:
+            # If we rolled the number then...
             if number >= 1:
+                # increase the number of sequential numbers
                 sequential +=1
+                # If the number of sequential numbers is better than the recorded maximum...
+                # Then store the new maximum
                 if sequential > max_sequential:
                     max_sequential = sequential
+            # If there were no dice for the rolled number then the sequence has ended
             else:
+                # Store the maximum if applicable
                 if sequential > max_sequential:
                     max_sequential = sequential
+                # Reset the sequential count to 0
                 sequential = 0
 
         # If we found 5 in a row large run...
         if max_sequential == 5:
             scores[Scores.LARGE_RUN] = Scores.scores_to_points[Scores.LARGE_RUN]
 
-        # If we found 4 in a row, a small run...
+        # If we found 4 or more in a row, a small run...
         if max_sequential >= 4:
             scores[Scores.SMALL_RUN] = Scores.scores_to_points[Scores.SMALL_RUN]
 
