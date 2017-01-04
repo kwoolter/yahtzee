@@ -4,12 +4,13 @@ import random
 
 import yahtzee.utils as utils
 
-
 class Player:
+    '''A class to represent the basic details of a Player.'''
     def __init__(self, name :str):
         self.name = name
 
 class Game:
+    '''A class to represent the whole game of Yahtzee.'''
 
     GAME_OVER = 0
     GAME_READY = 1
@@ -74,6 +75,7 @@ class Game:
         self.current_turn.hold_all()
 
     def end_turn(self):
+        '''Game.end_turn() - processing that happens at the end of a players turn.'''
 
         if self.state != Game.GAME_PLAYING:
             raise Exception("Game not in a state to end turn!")
@@ -94,6 +96,7 @@ class Game:
                 available_scores.append(score)
 
         # Ask the player to pick which score type they want to use this turn for
+        # This really belongs in the controller but hey ho!!!!
         chosen_score = utils.pick("Score", sorted(available_scores))
 
         # Store the selected score type in the current player's list of scores
@@ -107,7 +110,10 @@ class Game:
         for i in range(1,7):
             if "{0}'s".format(i) in player_scores.keys():
                 upper_total += player_scores["{0}'s".format(i)]
+
+        # If the total upper score is greater than or equal to the threshold...
         if upper_total >= Scores.UPPER_TOTAL_THRESHOLD:
+            #...then award a bonus.
             upper_total_bonus = Scores.scores_to_points[Scores.UPPER_TOTAL_BONUS]
             logging.info("Player {0} got an upper total bonus of {1}".format(self.current_player.name,upper_total_bonus))
             player_scores[Scores.UPPER_TOTAL_BONUS] = upper_total_bonus
@@ -121,6 +127,7 @@ class Game:
             if chosen_score != Scores.YAHTZEE and scores[Scores.YAHTZEE]:
                 yahtzee_bonus = Scores.scores_to_points[Scores.YAHTZEE_MULTI_BONUS]
                 logging.info("Player {0} got a multi-yahtzee bonus of {1}".format(self.current_player.name,yahtzee_bonus))
+
                 if Scores.YAHTZEE_MULTI_BONUS not in player_scores.keys():
                     player_scores[Scores.YAHTZEE_MULTI_BONUS] = 0
                 player_scores[Scores.YAHTZEE_MULTI_BONUS] += yahtzee_bonus
@@ -137,6 +144,7 @@ class Game:
         self.current_turn.unhold(dice_number)
 
     def add_player(self, new_player : Player):
+        '''Game.add_player - Add a new player to the game.'''
 
         if self.state != Game.GAME_READY:
             raise Exception("Game not in a state to add players!")
@@ -144,6 +152,7 @@ class Game:
         self.players.append(new_player)
 
     def start(self):
+        '''Game.start() - start the game by initialising the core game variables.'''
         self.player_scores = {}
         self.winning_score = 0
         self.winners = []
@@ -189,11 +198,15 @@ class Game:
         hst.print()
 
     def end(self):
+        '''Game.end() - end the game.'''
+
         if self.state != Game.GAME_OVER:
             raise Exception("Game is not over yet")
 
+        # Calculate which players are the winners.
         self.calc_leaders()
 
+        # See which player's made it into the High Score Table
         for player in self.players:
             if player.name in self.player_scores.keys():
                 player_scores = self.player_scores[player.name]
@@ -205,6 +218,7 @@ class Game:
         self.hst.save()
 
     def calc_leaders(self):
+        '''Game.calc_leaders() - Calculate who the current leaders are.'''
         self.winning_score = 0
         self.winners = []
 
@@ -224,6 +238,7 @@ class Game:
 
 
 class Scores:
+    '''A class to capture the types of score and the score you get for rolling them.'''
 
     THREE_OF_A_KIND = "3 of a kind"
     FOUR_OF_A_KIND = "4 of a kind"
@@ -263,6 +278,8 @@ class Scores:
         return new_score_sheet
 
 class Turn:
+    '''A class to represent a player's turn in the game of Yahtzee.'''
+
     TURN_OVER = 0
     READY = 1
     PLAYING = 2
@@ -282,6 +299,8 @@ class Turn:
 
     @property
     def state(self):
+        '''Turn.state() - return the current state of the turn.'''
+
         if self.complete is True:
             return Turn.TURN_OVER
         elif self.rolls == 0:
@@ -292,6 +311,7 @@ class Turn:
             return Turn.LAST_ROLL_DONE
 
     def roll(self):
+        '''Turn.roll() - roll all non-held dice.'''
 
         if self.state not in (Turn.READY, Turn.PLAYING):
             raise Exception("You don't have any more rolls")
@@ -309,6 +329,8 @@ class Turn:
         logging.info("Player %s rolled %s." % (self.player.name, str(self.current_roll)))
 
     def hold(self, dice_number : int):
+        '''Turn.hold(int) - Hold a dice from the current roll that matches the specified number.'''
+
         if self.state != Turn.PLAYING:
             raise Exception("You don't have any more rolls")
 
@@ -325,6 +347,7 @@ class Turn:
             raise Exception("Dice value {0} not in current roll {1}".format(dice_choice, self.current_roll))
 
     def hold_all(self):
+        ''' Turn.hold_all() - hold all dice'''
         if self.state != Turn.PLAYING:
             raise Exception("You don't have any more rolls")
 
@@ -332,6 +355,7 @@ class Turn:
             self.hold(dice_number)
 
     def unhold(self, dice_number : int):
+        '''Turn.unhold(int) - unhold a held dice that matches the specified number.'''
 
         if self.state != Turn.PLAYING:
             raise Exception("You don't have any more rolls")
@@ -349,10 +373,13 @@ class Turn:
             raise Exception("Dice value {0} not held in slots {1}".format(dice_choice, self.slots))
 
     def end(self):
+        '''Turn.end() - set the state of the turn to finished.'''
         logging.info("Player %s has ended their turn" % self.player.name)
         self.complete = True
 
     def score(self):
+        '''Turn.score() - Calculate all of the possible scores that can be achieved from the current rice roll.
+        Returns a dict that contains a map from score type to the score achieved e.g. Yahtzee : 50.'''
 
         # Create a list of all possible types of score
         scores = Scores.blank_score_sheet()
@@ -360,11 +387,15 @@ class Turn:
         # Find the possible scores of all dice
         all_dice = self.slots + self.current_roll
 
-        # First calculate the basic number scores and build a list of the number of occurrences of each number
+        # First calculate the basic number scores and build a list of the frequency of each number
         # at the same time for use later on e.g. (1,3,3,6,6) -> (1,0,2,0,0,2)
         number_counts = []
         for i in range(1,7):
+
+            # Store the frequency of the dice number in the rolled dice
             number_counts.append(all_dice.count(i))
+
+            # Store the score of each number i.e. dice number x frequency
             scores["{0}'s".format(i)] = all_dice.count(i) * i
 
         # Chance is a sum of all dice regardless of any patterns...
@@ -390,13 +421,13 @@ class Turn:
         sequential = 0
         max_sequential = sequential
 
-        # Go through each number in sequence
+        # Go through the frequency of each number and look for sequences
         for number in number_counts:
             # If we rolled the number then...
             if number >= 1:
                 # increase the number of sequential numbers
                 sequential +=1
-                # If the number of sequential numbers is better than the recorded maximum...
+                # If the count of sequential numbers is better than the recorded maximum...
                 # Then store the new maximum
                 if sequential > max_sequential:
                     max_sequential = sequential
@@ -408,11 +439,11 @@ class Turn:
                 # Reset the sequential count to 0
                 sequential = 0
 
-        # If we found 5 in a row large run...
+        # If we found 5 numbers in a row large run...
         if max_sequential == 5:
             scores[Scores.LARGE_RUN] = Scores.scores_to_points[Scores.LARGE_RUN]
 
-        # If we found 4 or more in a row, a small run...
+        # If we found 4 numbers or more in a row, a small run...
         if max_sequential >= 4:
             scores[Scores.SMALL_RUN] = Scores.scores_to_points[Scores.SMALL_RUN]
 
@@ -427,10 +458,4 @@ class Turn:
                                                                     Turn.state_to_text[self.state]
                                                                     ))
         self.score()
-
-
-
-
-
-
 
