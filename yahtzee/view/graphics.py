@@ -55,7 +55,7 @@ class ScoreView:
     HEADER_HEIGHT = 20
     HEADER_WIDTH = 120
     SCORE_HEIGHT = 18
-    SCORE_WIDTH = 150
+    SCORE_WIDTH = 170
     PADDING = 3
     SCORE_TEXT_SIZE = 22
 
@@ -141,12 +141,12 @@ class ScoreView:
                     draw_text(self.surface,msg = "{0}".format(score), x=x,y=y,
                               bg_colour=bg_colour,
                               fg_colour=fg_colour,
-                              size = ScoreView.SCORE_HEIGHT)
+                              size = ScoreView.SCORE_TEXT_SIZE)
                 else:
                     draw_text(self.surface,msg = "-", x=x,y=y,
                               bg_colour=colours.Colours.BLUE,
                               fg_colour=colours.Colours.WHITE,
-                              size=ScoreView.SCORE_HEIGHT)
+                              size=ScoreView.SCORE_TEXT_SIZE)
 
             y += ScoreView.SCORE_HEIGHT + ScoreView.PADDING
 
@@ -188,13 +188,13 @@ class ScoreView:
                     draw_text(self.surface, msg="{0}".format(score), x=x, y=y,
                               bg_colour=bg_colour,
                               fg_colour=fg_colour,
-                              size=ScoreView.SCORE_HEIGHT)
+                              size=ScoreView.SCORE_TEXT_SIZE)
 
                 else:
                     draw_text(self.surface,msg = "-", x=x,y=y,
                               bg_colour=colours.Colours.BLUE,
                               fg_colour=colours.Colours.WHITE,
-                              size=ScoreView.SCORE_HEIGHT)
+                              size=ScoreView.SCORE_TEXT_SIZE)
 
             y += ScoreView.SCORE_HEIGHT + ScoreView.PADDING
 
@@ -204,7 +204,8 @@ class ScoreView:
 
         draw_text(self.surface,msg="TOTAL", x=x,y=y,
                   bg_colour=colours.Colours.BLUE,
-                  fg_colour=colours.Colours.WHITE)
+                  fg_colour=colours.Colours.WHITE,
+                  size=ScoreView.SCORE_TEXT_SIZE)
 
         for player in self.game.players:
 
@@ -226,11 +227,13 @@ class ScoreView:
                 score = sum(player_scores.values())
                 draw_text(self.surface,msg="{0}".format(score),x=x,y=y,
                           fg_colour=fg_colour,
-                          bg_colour=bg_colour)
+                          bg_colour=bg_colour,
+                          size=ScoreView.SCORE_TEXT_SIZE)
             else:
                 draw_text(self.surface,msg="-",x=x,y=y,
                           fg_colour=fg_colour,
-                          bg_colour=bg_colour)
+                          bg_colour=bg_colour,
+                          size=ScoreView.SCORE_TEXT_SIZE)
 
 class TurnView:
 
