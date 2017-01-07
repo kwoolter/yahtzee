@@ -8,3 +8,4 @@ class Colours:
     GREY = (30, 30, 30)
     GREY = (40, 40, 40)
     GOLD = (255, 201, 14)
+    YELLOW = (255, 255, 0)
