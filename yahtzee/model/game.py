@@ -83,25 +83,16 @@ class Game:
             raise Exception("Turn not started yet to score a turn!")
 
         # Get the list of possible scores from the current turn
-        scores = self.current_turn.score()
-
-        if chosen_score not in scores.keys:
-            raise Exception("Score type {0} is not valid!".format(chosen_score))
-
-        # Get the list of score types that the current player has selected already
-        if self.current_player.name not in self.player_scores.keys():
-            self.player_scores[self.current_player.name] = {}
-
-        player_scores = self.player_scores[self.current_player.name]
-
-        # Build a list of available scores i.e. scores types that the player has not yet selected
-        available_scores = []
-        for score in scores.keys():
-            if  score not in player_scores.keys():
-                available_scores.append(score)
+        available_scores = self.available_score()
 
         if chosen_score not in available_scores:
-            raise Exception("Score type {0} is available!".format(chosen_score))
+            raise Exception("Score type {0} is not available to select!".format(chosen_score))
+
+        # Get the current player scores
+        player_scores = self.player_scores[self.current_player.name]
+
+        # Get the list of possible scores from the current turn
+        scores = self.current_turn.score()
 
         # Store the selected score type in the current player's list of scores
         player_scores[chosen_score] = scores[chosen_score]
@@ -139,6 +130,25 @@ class Game:
         # The turn is now ended
         self.current_turn.end()
         self.calc_leaders()
+
+    def available_score(self):
+
+        # Get the list of possible scores from the current turn
+        scores = self.current_turn.score()
+
+        # Get the list of score types that the current player has selected already
+        if self.current_player.name not in self.player_scores.keys():
+            self.player_scores[self.current_player.name] = {}
+
+        player_scores = self.player_scores[self.current_player.name]
+
+        # Build a list of available scores i.e. scores types that the player has not yet selected
+        available_scores = []
+        for score in scores.keys():
+            if  score not in player_scores.keys():
+                available_scores.append(score)
+
+        return available_scores
 
     def end_turn(self):
         '''Game.end_turn() - processing that happens at the end of a players turn.'''

@@ -27,21 +27,27 @@ def main_loop():
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP:
-                if event.key == (K_SPACE):
+                if event.key == K_SPACE:
                     try:
                         game.start()
                     except Exception as err:
                         print(str(err))
 
-                elif event.key == (K_r):
+                elif event.key == K_r:
                     try:
                         game.roll()
                     except Exception as err:
                         print(str(err))
 
-                elif event.key == (K_e):
+                elif event.key == K_e:
                     try:
                         game.end_turn()
+                    except Exception as err:
+                        print(str(err))
+
+                elif event.key == K_s:
+                    try:
+                        game.score_turn("1's")
                     except Exception as err:
                         print(str(err))
 

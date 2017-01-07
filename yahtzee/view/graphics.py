@@ -35,13 +35,13 @@ class MainFrame:
 
         self.surface.fill(colours.Colours.GREY)
 
-        x=MainFrame.PANE_PADDING
-        y=MainFrame.PANE_PADDING
+        x = MainFrame.PANE_PADDING
+        y = MainFrame.PANE_PADDING
 
         self.turn_view.draw()
         self.surface.blit(self.turn_view.surface, (x,y))
 
-        y+=self.turn_view.surface.get_rect().height + MainFrame.PANE_PADDING
+        y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
 
         self.score_view.draw()
         self.surface.blit(self.score_view.surface, (x,y))
@@ -58,6 +58,7 @@ class ScoreView:
     SCORE_WIDTH = 170
     PADDING = 3
     SCORE_TEXT_SIZE = 22
+    HEADER_TEXT_SIZE = 32
 
     def __init__(self, width : int = 500, height : int = None):
 
@@ -89,11 +90,15 @@ class ScoreView:
         if self.game.state == model.Game.GAME_PLAYING:
 
             draw_text(self.surface,"  Scores  ({0})  ".format(model.Game.STATE[self.game.state]),
-                      self.surface.get_rect().centerx, ScoreView.TITLE_HEIGHT/2)
+                      pane_rect.centerx,
+                      ScoreView.TITLE_HEIGHT/2,
+                      size=ScoreView.HEADER_TEXT_SIZE,
+                      bg_colour = colours.Colours.GREY)
 
-        # Game to update current leaders
+        # Game to update current leaders so that we can highlight them
         self.game.calc_leaders()
 
+        # Draw The players names at the top of the score view
         x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
         y = ScoreView.TITLE_HEIGHT + ScoreView.PADDING + ScoreView.HEADER_HEIGHT/2
 
@@ -122,9 +127,9 @@ class ScoreView:
                       bg_colour=colours.Colours.BLUE,
                       size = ScoreView.SCORE_TEXT_SIZE)
 
-            for player in self.game.players:
+            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
 
-                x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
+            for player in self.game.players:
 
                 if player.name in self.game.player_scores.keys():
                     player_scores = self.game.player_scores[player.name]
@@ -148,6 +153,8 @@ class ScoreView:
                               fg_colour=colours.Colours.WHITE,
                               size=ScoreView.SCORE_TEXT_SIZE)
 
+                x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
+
             y += ScoreView.SCORE_HEIGHT + ScoreView.PADDING
 
         # Print lower section scores
@@ -170,9 +177,10 @@ class ScoreView:
                       fg_colour=colours.Colours.WHITE,
                       size=ScoreView.SCORE_TEXT_SIZE)
 
-            for player in self.game.players:
 
-                x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
+            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
+
+            for player in self.game.players:
 
                 if player.name in self.game.player_scores.keys():
                     player_scores = self.game.player_scores[player.name]
@@ -196,6 +204,8 @@ class ScoreView:
                               fg_colour=colours.Colours.WHITE,
                               size=ScoreView.SCORE_TEXT_SIZE)
 
+                x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
+
             y += ScoreView.SCORE_HEIGHT + ScoreView.PADDING
 
         #Print score table footer
@@ -207,9 +217,9 @@ class ScoreView:
                   fg_colour=colours.Colours.WHITE,
                   size=ScoreView.SCORE_TEXT_SIZE)
 
-        for player in self.game.players:
+        x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
 
-            x += ScoreView.PADDING + ScoreView.HEADER_WIDTH
+        for player in self.game.players:
 
             if player == self.game.current_player:
                 bg_colour = colours.Colours.GREEN
@@ -234,6 +244,8 @@ class ScoreView:
                           fg_colour=fg_colour,
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
+
+            x += ScoreView.PADDING + ScoreView.HEADER_WIDTH
 
 class TurnView:
 
