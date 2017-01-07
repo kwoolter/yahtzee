@@ -74,6 +74,72 @@ class Game:
 
         self.current_turn.hold_all()
 
+    def score_turn(self, chosen_score : str):
+
+        if self.state != Game.GAME_PLAYING:
+            raise Exception("Game not in a state to score a turn!")
+
+        if self.current_turn.state == Turn.READY:
+            raise Exception("Turn not started yet to score a turn!")
+
+        # Get the list of possible scores from the current turn
+        scores = self.current_turn.score()
+
+        if chosen_score not in scores.keys:
+            raise Exception("Score type {0} is not valid!".format(chosen_score))
+
+        # Get the list of score types that the current player has selected already
+        if self.current_player.name not in self.player_scores.keys():
+            self.player_scores[self.current_player.name] = {}
+
+        player_scores = self.player_scores[self.current_player.name]
+
+        # Build a list of available scores i.e. scores types that the player has not yet selected
+        available_scores = []
+        for score in scores.keys():
+            if  score not in player_scores.keys():
+                available_scores.append(score)
+
+        if chosen_score not in available_scores:
+            raise Exception("Score type {0} is available!".format(chosen_score))
+
+        # Store the selected score type in the current player's list of scores
+        player_scores[chosen_score] = scores[chosen_score]
+        print("Player {0} got a turn score of {1} with {2}.".format(self.current_player.name,
+                                                                    scores[chosen_score],
+                                                                    chosen_score))
+
+        # See if the player has got an upper total bonus and add to their score types
+        upper_total = 0
+        for i in range(1,7):
+            if "{0}'s".format(i) in player_scores.keys():
+                upper_total += player_scores["{0}'s".format(i)]
+
+        # If the total upper score is greater than or equal to the threshold...
+        if upper_total >= Scores.UPPER_TOTAL_THRESHOLD:
+            #...then award a bonus.
+            upper_total_bonus = Scores.scores_to_points[Scores.UPPER_TOTAL_BONUS]
+            logging.info("Player {0} got an upper total bonus of {1}".format(self.current_player.name,upper_total_bonus))
+            player_scores[Scores.UPPER_TOTAL_BONUS] = upper_total_bonus
+
+        # Now see if the player got an additional Yahtzee bonus..
+        # If the player has already had a Yahtzee scored...
+        # And the player did not choose Yahtzee..
+        # And they had the option to...
+        if Scores.YAHTZEE in player_scores.keys() and player_scores[Scores.YAHTZEE] > 0:
+
+            if chosen_score != Scores.YAHTZEE and scores[Scores.YAHTZEE]:
+                yahtzee_bonus = Scores.scores_to_points[Scores.YAHTZEE_MULTI_BONUS]
+                logging.info("Player {0} got a multi-yahtzee bonus of {1}".format(self.current_player.name,yahtzee_bonus))
+
+                if Scores.YAHTZEE_MULTI_BONUS not in player_scores.keys():
+                    player_scores[Scores.YAHTZEE_MULTI_BONUS] = 0
+                player_scores[Scores.YAHTZEE_MULTI_BONUS] += yahtzee_bonus
+
+        # The turn is now ended
+        self.current_turn.end()
+        self.calc_leaders()
+
     def end_turn(self):
         '''Game.end_turn() - processing that happens at the end of a players turn.'''
 
