@@ -1,4 +1,6 @@
 import pygame,os, sys
+from pygame.locals import *
+import yahtzee.utils.colours as colours
 
 
 class MainFrame:
@@ -10,6 +12,7 @@ class MainFrame:
         self.surface = pygame.display.set_mode((width, height))
 
     def initialise(self):
+        os.environ["SDL_VIDEO_CENTERED"] = "1"
         pygame.init()
         pygame.display.set_caption(self.name)
         filename = MainFrame.RESOURCES_DIR + self.name + ".jpg"
@@ -17,7 +20,26 @@ class MainFrame:
         image = pygame.transform.scale(image, (32, 32))
         pygame.display.set_icon(image)
 
-
-
     def draw(self):
-        pass
+        self.surface.fill(colours.Colours.BLUE)
+
+    def update(self):
+        pygame.display.update()
+
+
+
+if __name__ == "__main__":
+
+    os.environ["SDL_VIDEO_CENTERED"] = "1"
+
+    frame = MainFrame("yahtzee", 400, 600)
+    frame.initialise()
+
+    # main game loop
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+        frame.draw()
+        frame.update()
