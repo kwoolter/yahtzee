@@ -18,7 +18,11 @@ def main_loop():
     frame = view.MainFrame("yahtzee", 600, 700)
     frame.initialise(game)
 
+    score_picker = view.ScorePickerView(300)
+    score_picker.initialise(game)
+
     FPSCLOCK = pygame.time.Clock()
+
 
     # main game loop
     while True:
@@ -47,7 +51,8 @@ def main_loop():
 
                 elif event.key == K_s:
                     try:
-                        game.score_turn("1's")
+                        pick_a_score = True
+                        #game.score_turn("1's")
                     except Exception as err:
                         print(str(err))
 
@@ -68,6 +73,7 @@ def main_loop():
         FPSCLOCK.tick(30)
         frame.draw()
         frame.update()
+
 
 
 if __name__ == "__main__":

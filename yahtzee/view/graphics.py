@@ -16,6 +16,7 @@ class MainFrame:
 
         self.turn_view = TurnView(width = width - MainFrame.PANE_PADDING * 2)
         self.score_view = ScoreView(width = width - MainFrame.PANE_PADDING * 2)
+        self.score_picker = ScorePickerView(width = width - MainFrame.PANE_PADDING * 2, height=self.score_view.surface.get_height())
 
     def initialise(self, game : model.Game):
         self.game = game
@@ -30,6 +31,7 @@ class MainFrame:
 
         self.turn_view.initialise(self.game)
         self.score_view.initialise(self.game)
+        self.score_picker.initialise(self.game)
 
     def draw(self):
 
@@ -45,6 +47,13 @@ class MainFrame:
 
         self.score_view.draw()
         self.surface.blit(self.score_view.surface, (x,y))
+
+        y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
+
+        if  self.game.current_turn is not None and \
+                        self.game.current_turn.state == model.Turn.LAST_ROLL_DONE:
+            self.score_picker.draw()
+            self.surface.blit(self.score_picker.surface, (x, y))
 
     def update(self):
         pygame.display.update()
@@ -342,6 +351,51 @@ class SpriteView(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = int(self._x)
         self.rect.y = int(self._y)
+
+
+class ScorePickerView:
+
+    TITLE_HEIGHT = 40
+    TITLE_TEXT_SIZE = 30
+    CHOICE_HEIGHT = 20
+    CHOICE_TEXT_SIZE = 24
+
+    def __init__(self, width : int = 500, height : int = None):
+
+        self.game = None
+
+        if height is None:
+            height = 200
+
+        self.surface = pygame.Surface((width, height))
+
+    def initialise(self, game : model.Game):
+
+        self.game = game
+
+    def draw(self):
+
+        self.surface.fill(colours.Colours.BLACK)
+
+        pane_rect = self.surface.get_rect()
+
+        y = ScorePickerView.TITLE_HEIGHT/2
+        x = pane_rect.centerx
+
+        draw_text(self.surface,msg="Pick a score for this turn:-", x=x,y=y,
+                  size=ScorePickerView.TITLE_TEXT_SIZE)
+
+        y = ScorePickerView.TITLE_HEIGHT + 10
+
+        available_scores = self.game.available_scores()
+        choice_number = 1
+        for score in available_scores:
+            draw_text(self.surface,msg="{0}. {1}".format(choice_number, score), x=x,y=y,
+                  size=ScorePickerView.CHOICE_TEXT_SIZE)
+            choice_number += 1
+            y+=ScorePickerView.CHOICE_HEIGHT
+
+
 
 
 def draw_text(surface, msg, x, y, size=32, fg_colour=colours.Colours.WHITE, bg_colour=colours.Colours.BLACK):

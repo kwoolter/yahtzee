@@ -83,7 +83,7 @@ class Game:
             raise Exception("Turn not started yet to score a turn!")
 
         # Get the list of possible scores from the current turn
-        available_scores = self.available_score()
+        available_scores = self.available_scores()
 
         if chosen_score not in available_scores:
             raise Exception("Score type {0} is not available to select!".format(chosen_score))
@@ -131,7 +131,7 @@ class Game:
         self.current_turn.end()
         self.calc_leaders()
 
-    def available_score(self):
+    def available_scores(self):
 
         # Get the list of possible scores from the current turn
         scores = self.current_turn.score()
