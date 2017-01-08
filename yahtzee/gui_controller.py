@@ -12,9 +12,9 @@ def main_loop():
     os.environ["SDL_VIDEO_CENTERED"] = "1"
 
     game = model.Game()
-    game.add_player(model.Player("Rosie"))
+    #game.add_player(model.Player("Rosie"))
     game.add_player(model.Player("Jack"))
-    #game.add_player(model.Player("Keith"))
+    game.add_player(model.Player("Keith"))
 
     frame = view.MainFrame("yahtzee", 600, 700)
     frame.initialise(game)
@@ -40,7 +40,11 @@ def main_loop():
 
                 elif event.key == K_q:
                     try:
-                        game.quit()
+                        if game.state == model.Game.GAME_OVER:
+                            pygame.quit()
+                            sys.exit()
+                        else:
+                            game.quit()
                     except Exception as err:
                         print(str(err))
 

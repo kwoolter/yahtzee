@@ -16,7 +16,7 @@ class Game:
     GAME_READY = 1
     GAME_PLAYING = 2
     MAX_ROUNDS = 13
-    MAX_ROUNDS = 2
+    #MAX_ROUNDS = 2
     STATE = {GAME_OVER: "Game Over", GAME_READY : "Game Ready", GAME_PLAYING : "Game Playing"}
 
     def __init__(self):

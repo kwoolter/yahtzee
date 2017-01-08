@@ -68,7 +68,7 @@ class MainFrame:
             draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50)
 
             y += 35
-            draw_text(self.surface, "  Winners:  ", x=pane_rect.centerx, y=y, size=30)
+            draw_text(self.surface, "  Winners:  ", x=pane_rect.centerx, y=y, size=30, fg_colour=colours.Colours.GOLD)
             for player in self.game.winners:
                 y += 30
                 draw_text(self.surface, "{0} with a score of {1}".format(player.name, self.game.winning_score),
@@ -94,14 +94,15 @@ class MainFrame:
 
 
 class ScoreView:
-    TITLE_HEIGHT = 40
+    TITLE_HEIGHT = 30
     HEADER_HEIGHT = 20
-    HEADER_WIDTH = 120
+    HEADER_WIDTH = 100
     SCORE_HEIGHT = 18
     SCORE_WIDTH = 170
     PADDING = 3
     SCORE_TEXT_SIZE = 22
     HEADER_TEXT_SIZE = 32
+    NO_SCORE = "---"
 
     def __init__(self, width: int = 500, height: int = None):
 
@@ -182,7 +183,7 @@ class ScoreView:
                         bg_colour = colours.Colours.BLUE
                         fg_colour = colours.Colours.WHITE
                     else:
-                        score = "-"
+                        score = ScoreView.NO_SCORE
                         bg_colour = colours.Colours.BLUE
                         fg_colour = colours.Colours.BLACK
 
@@ -191,9 +192,9 @@ class ScoreView:
                               fg_colour=fg_colour,
                               size=ScoreView.SCORE_TEXT_SIZE)
                 else:
-                    draw_text(self.surface, msg="-", x=x, y=y,
+                    draw_text(self.surface, msg=ScoreView.NO_SCORE, x=x, y=y,
                               bg_colour=colours.Colours.BLUE,
-                              fg_colour=colours.Colours.WHITE,
+                              fg_colour=colours.Colours.BLACK,
                               size=ScoreView.SCORE_TEXT_SIZE)
 
                 x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
@@ -229,11 +230,11 @@ class ScoreView:
                     if score_type in player_scores.keys():
                         score = player_scores[score_type]
                         bg_colour = colours.Colours.BLUE
-                        fg_colour = colours.Colours.BLACK
-                    else:
-                        score = "-"
-                        bg_colour = colours.Colours.BLUE
                         fg_colour = colours.Colours.WHITE
+                    else:
+                        score = ScoreView.NO_SCORE
+                        bg_colour = colours.Colours.BLUE
+                        fg_colour = colours.Colours.BLACK
 
                     draw_text(self.surface, msg="{0}".format(score), x=x, y=y,
                               bg_colour=bg_colour,
@@ -241,9 +242,9 @@ class ScoreView:
                               size=ScoreView.SCORE_TEXT_SIZE)
 
                 else:
-                    draw_text(self.surface, msg="-", x=x, y=y,
+                    draw_text(self.surface, msg=ScoreView.NO_SCORE, x=x, y=y,
                               bg_colour=colours.Colours.BLUE,
-                              fg_colour=colours.Colours.WHITE,
+                              fg_colour=colours.Colours.BLACK,
                               size=ScoreView.SCORE_TEXT_SIZE)
 
                 x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
@@ -282,7 +283,7 @@ class ScoreView:
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
             else:
-                draw_text(self.surface, msg="-", x=x, y=y,
+                draw_text(self.surface, msg=ScoreView.NO_SCORE, x=x, y=y,
                           fg_colour=fg_colour,
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
@@ -464,7 +465,8 @@ class HighScoreTableView:
         x = pane_rect.centerx
 
         draw_text(self.surface, msg="High Score Table", x=x, y=y,
-                  size=ScorePickerView.TITLE_TEXT_SIZE)
+                  size=ScorePickerView.TITLE_TEXT_SIZE,
+                  fg_colour=colours.Colours.GOLD)
 
         rank = 1
         for entry in self.hst.table:
