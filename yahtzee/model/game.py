@@ -27,7 +27,6 @@ class Game:
         self.current_round = 0
         self.current_player_id = 0
         self.current_turn = None
-        self._state = Game.GAME_READY
 
         self.hst = utils.HighScoreTable("PyYahtzee")
         self.hst.load()
@@ -238,12 +237,22 @@ class Game:
 
     def start(self):
         '''Game.start() - start the game by initialising the core game variables.'''
+
+        if self.state == Game.GAME_PLAYING:
+            raise Exception("Game not in a state start!")
+
         self.player_scores = {}
         self.winning_score = 0
         self.winners = []
         self.current_player_id = 0
         self.current_round = 1
         self.current_turn = Turn(self.current_player)
+
+    def quit(self):
+        if self.state != Game.GAME_PLAYING:
+            raise Exception("Game not in a state to quit!")
+
+        self.current_round = Game.MAX_ROUNDS + 1
 
     def next_player(self):
 

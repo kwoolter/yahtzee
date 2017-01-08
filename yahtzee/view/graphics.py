@@ -132,7 +132,7 @@ class ScoreView:
 
             score_type = "{0}'s".format(i)
             draw_text(self.surface,x=x,y=y,msg="{0}'s".format(i),
-                      fg_colour=colours.Colours.BLACK,
+                      fg_colour=colours.Colours.WHITE,
                       bg_colour=colours.Colours.BLUE,
                       size = ScoreView.SCORE_TEXT_SIZE)
 
@@ -145,11 +145,11 @@ class ScoreView:
                     if score_type in player_scores.keys():
                         score = player_scores[score_type]
                         bg_colour = colours.Colours.BLUE
-                        fg_colour = colours.Colours.BLACK
+                        fg_colour = colours.Colours.WHITE
                     else:
                         score = "-"
                         bg_colour = colours.Colours.BLUE
-                        fg_colour = colours.Colours.WHITE
+                        fg_colour = colours.Colours.BLACK
 
 
                     draw_text(self.surface,msg = "{0}".format(score), x=x,y=y,

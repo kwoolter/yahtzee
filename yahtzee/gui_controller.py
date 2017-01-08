@@ -38,6 +38,12 @@ def main_loop():
                     except Exception as err:
                         print(str(err))
 
+                elif event.key == K_q:
+                    try:
+                        game.quit()
+                    except Exception as err:
+                        print(str(err))
+
                 elif event.key == K_r:
                     try:
                         game.roll()
