@@ -244,7 +244,7 @@ class ScoreView:
 
                 player_scores = self.game.player_scores[player.name]
                 score = sum(player_scores.values())
-                draw_text(self.surface,msg="{0}".format(score),x=x,y=y,
+                draw_text(self.surface,msg="  {0}  ".format(score),x=x,y=y,
                           fg_colour=fg_colour,
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
