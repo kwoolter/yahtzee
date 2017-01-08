@@ -31,6 +31,8 @@ class Game:
         self.hst = utils.HighScoreTable("PyYahtzee")
         self.hst.load()
 
+        self.hst_updated = False
+
     @property
     def current_player(self):
         if self.players is None or len(self.players) == 0:
@@ -247,6 +249,7 @@ class Game:
         self.current_player_id = 0
         self.current_round = 1
         self.current_turn = Turn(self.current_player)
+        self.hst_updated = False
 
     def quit(self):
         if self.state != Game.GAME_PLAYING:
@@ -297,19 +300,24 @@ class Game:
         if self.state != Game.GAME_OVER:
             raise Exception("Game is not over yet")
 
-        # Calculate which players are the winners.
-        self.calc_leaders()
+        if self.hst_updated == False:
 
-        # See which player's made it into the High Score Table
-        for player in self.players:
-            if player.name in self.player_scores.keys():
-                player_scores = self.player_scores[player.name]
-                total_score = sum(player_scores.values())
-                if self.hst.is_high_score(total_score):
-                    logging.info("Player {0} got a new high score of {1}!".format(player.name, total_score))
-                    self.hst.add(player.name, total_score)
+            #Calculate which players are the winners.
+            self.calc_leaders()
 
-        self.hst.save()
+            # See which player's made it into the High Score Table
+            for player in self.players:
+                if player.name in self.player_scores.keys():
+                    player_scores = self.player_scores[player.name]
+                    total_score = sum(player_scores.values())
+                    if self.hst.is_high_score(total_score):
+                        logging.info("Player {0} got a new high score of {1}!".format(player.name, total_score))
+                        self.hst.add(player.name, total_score)
+
+            self.hst.save()
+
+            self.hst_updated = True
+
 
     def calc_leaders(self):
         '''Game.calc_leaders() - Calculate who the current leaders are.'''
