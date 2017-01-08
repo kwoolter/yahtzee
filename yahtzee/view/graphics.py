@@ -2,6 +2,7 @@ import pygame,os, sys
 from pygame.locals import *
 import yahtzee.utils.colours as colours
 import yahtzee.model.game as model
+import yahtzee.utils as utils
 
 
 class MainFrame:
@@ -17,6 +18,7 @@ class MainFrame:
         self.turn_view = TurnView(width = width - MainFrame.PANE_PADDING * 2)
         self.score_view = ScoreView(width = width - MainFrame.PANE_PADDING * 2)
         self.score_picker = ScorePickerView(width = width - MainFrame.PANE_PADDING * 2, height=self.score_view.surface.get_height())
+        self.hst = HighScoreTableView(width = width - MainFrame.PANE_PADDING * 2, height=self.score_view.surface.get_height())
 
     def initialise(self, game : model.Game):
         self.game = game
@@ -32,6 +34,7 @@ class MainFrame:
         self.turn_view.initialise(self.game)
         self.score_view.initialise(self.game)
         self.score_picker.initialise(self.game)
+        self.hst.initialise(self.game.hst)
 
     def draw(self):
 
@@ -54,6 +57,21 @@ class MainFrame:
                         self.game.current_turn.state == model.Turn.LAST_ROLL_DONE:
             self.score_picker.draw()
             self.surface.blit(self.score_picker.surface, (x, y))
+
+        if self.game.state == model.Game.GAME_OVER:
+            pane_rect = self.surface.get_rect()
+            y=25
+            draw_text(self.surface,"  G A M E    O V E R  ", x=pane_rect.centerx, y = y, size = 50)
+            y+=50
+            draw_text(self.surface, "  Winner:  ", x=pane_rect.centerx, y=y, size=50)
+            for player in self.game.winners:
+                y+=30
+                draw_text(self.surface, "{0} with a score of {1}.".format(player.name, self.game.winning_score),
+                          x=pane_rect.centerx, y=y, size=30)
+
+            self.hst.draw()
+            self.surface.blit(self.hst.surface, (x, y))
+
 
     def update(self):
         pygame.display.update()
@@ -86,6 +104,9 @@ class ScoreView:
         self.game = game
 
     def draw(self):
+
+        if self.game is None:
+            raise ("No game to view scores!")
 
         pane_rect = self.surface.get_rect()
 
@@ -276,6 +297,7 @@ class TurnView:
         self.game = game
 
     def draw(self):
+
         if self.game is None:
             raise Exception("No game to view!!!")
 
@@ -375,6 +397,9 @@ class ScorePickerView:
 
     def draw(self):
 
+        if self.game is None:
+            raise("No game set for Score Picker View!")
+
         self.surface.fill(colours.Colours.BLACK)
 
         pane_rect = self.surface.get_rect()
@@ -395,6 +420,46 @@ class ScorePickerView:
             choice_number += 1
             y+=ScorePickerView.CHOICE_HEIGHT
 
+
+class HighScoreTableView:
+
+    TITLE_HEGHT = 24
+    TITLE_TEXT_SIZE = 20
+    SCORE_HEIGHT = 20
+    SCORE_TEXT_SIZE = 20
+
+    def __init__(self, width : int, height : int = None):
+        self.hst = None
+
+        self.surface = pygame.Surface((width, height))
+
+    def initialise(self, hst : utils.HighScoreTable):
+        self.hst = hst
+
+    def draw(self):
+
+        if self.hst is None:
+            raise("No High Score Table to view!")
+
+        self.surface.fill(colours.Colours.BLACK)
+
+        pane_rect = self.surface.get_rect()
+
+        y = ScorePickerView.TITLE_HEIGHT/2
+        x = pane_rect.centerx
+
+        draw_text(self.surface,msg="High Score Table", x=x,y=y,
+                  size=ScorePickerView.TITLE_TEXT_SIZE)
+
+        rank = 1
+        for entry in self.hst.table:
+
+            y+= HighScoreTableView.SCORE_HEIGHT
+
+            name, score = entry
+            draw_text(self.surface, msg="{0}. {1} - {2}".format(rank,name,score), x=x, y=y,
+                      size=HighScoreTableView.SCORE_TEXT_SIZE)
+            rank += 1
 
 
 

@@ -85,6 +85,13 @@ def main_loop():
             except Exception as err:
                 print(str(err))
 
+        if game.state == model.Game.GAME_OVER:
+            try:
+                game.end()
+            except Exception as err:
+                print(str(err))
+
+
 def select_score_number(surface, x, y):
 
     txtbx = utils.eztext.Input(maxlength=2, color=utils.Colours.WHITE, font=pygame.font.Font(None, 24),
