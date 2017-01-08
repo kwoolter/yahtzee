@@ -1,4 +1,4 @@
-import pygame,os, sys
+import pygame, os, sys
 from pygame.locals import *
 import yahtzee.utils.colours as colours
 import yahtzee.model.game as model
@@ -10,17 +10,19 @@ class MainFrame:
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
     PANE_PADDING = 5
 
-    def __init__(self, name : str, width : int = 800, height : int = 800):
+    def __init__(self, name: str, width: int = 800, height: int = 800):
         self.name = name
         self.game = None
         self.surface = pygame.display.set_mode((width, height))
 
-        self.turn_view = TurnView(width = width - MainFrame.PANE_PADDING * 2)
-        self.score_view = ScoreView(width = width - MainFrame.PANE_PADDING * 2)
-        self.score_picker = ScorePickerView(width = width - MainFrame.PANE_PADDING * 2, height=self.score_view.surface.get_height())
-        self.hst = HighScoreTableView(width = width - MainFrame.PANE_PADDING * 2, height=self.score_view.surface.get_height())
+        self.turn_view = TurnView(width=width - MainFrame.PANE_PADDING * 2)
+        self.score_view = ScoreView(width=width - MainFrame.PANE_PADDING * 2)
+        self.score_picker = ScorePickerView(width=width - MainFrame.PANE_PADDING * 2,
+                                            height=self.score_view.surface.get_height())
+        self.hst = HighScoreTableView(width=width - MainFrame.PANE_PADDING * 2,
+                                      height=self.score_view.surface.get_height())
 
-    def initialise(self, game : model.Game):
+    def initialise(self, game: model.Game):
         self.game = game
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
@@ -44,40 +46,54 @@ class MainFrame:
         y = MainFrame.PANE_PADDING
 
         self.turn_view.draw()
-        self.surface.blit(self.turn_view.surface, (x,y))
+        self.surface.blit(self.turn_view.surface, (x, y))
 
         y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
 
         self.score_view.draw()
-        self.surface.blit(self.score_view.surface, (x,y))
+        self.surface.blit(self.score_view.surface, (x, y))
 
         y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
 
-        if  self.game.current_turn is not None and \
+        if self.game.current_turn is not None and \
                         self.game.current_turn.state == model.Turn.LAST_ROLL_DONE:
             self.score_picker.draw()
             self.surface.blit(self.score_picker.surface, (x, y))
 
         if self.game.state == model.Game.GAME_OVER:
+            self.surface.fill(colours.Colours.BLACK)
             pane_rect = self.surface.get_rect()
-            y=25
-            draw_text(self.surface,"  G A M E    O V E R  ", x=pane_rect.centerx, y = y, size = 50)
-            y+=50
-            draw_text(self.surface, "  Winner:  ", x=pane_rect.centerx, y=y, size=50)
+
+            y = 25
+            draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50)
+
+            y += 35
+            draw_text(self.surface, "  Winners:  ", x=pane_rect.centerx, y=y, size=30)
             for player in self.game.winners:
-                y+=30
-                draw_text(self.surface, "{0} with a score of {1}.".format(player.name, self.game.winning_score),
+                y += 30
+                draw_text(self.surface, "{0} with a score of {1}".format(player.name, self.game.winning_score),
                           x=pane_rect.centerx, y=y, size=30)
 
+            y += 35
+            draw_text(self.surface, "  Final Scores:  ", x=pane_rect.centerx, y=y, size=30)
+            for player in self.game.player_scores.keys():
+                if player not in self.game.winners:
+                    y += 20
+                    draw_text(self.surface, "{0} with a score of {1}".format(player, sum(self.game.player_scores[player].values())),
+                              x=pane_rect.centerx, y=y, size=20)
+
+            y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
             self.hst.draw()
             self.surface.blit(self.hst.surface, (x, y))
 
+            y = pane_rect.bottom - 30
+            draw_text(self.surface, "  Press 'Space Bar' to play again or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
 
     def update(self):
         pygame.display.update()
 
-class ScoreView:
 
+class ScoreView:
     TITLE_HEIGHT = 40
     HEADER_HEIGHT = 20
     HEADER_WIDTH = 120
@@ -87,7 +103,7 @@ class ScoreView:
     SCORE_TEXT_SIZE = 22
     HEADER_TEXT_SIZE = 32
 
-    def __init__(self, width : int = 500, height : int = None):
+    def __init__(self, width: int = 500, height: int = None):
 
         self.game = None
 
@@ -100,7 +116,7 @@ class ScoreView:
 
         self.surface = pygame.Surface((width, height))
 
-    def initialise(self, game : model.Game):
+    def initialise(self, game: model.Game):
         self.game = game
 
     def draw(self):
@@ -114,23 +130,22 @@ class ScoreView:
             raise Exception("No game to view!!!")
 
         self.surface.fill(colours.Colours.BLUE)
-        rect = pygame.Rect(0,0,pane_rect.width,ScoreView.TITLE_HEIGHT)
+        rect = pygame.Rect(0, 0, pane_rect.width, ScoreView.TITLE_HEIGHT)
         pygame.draw.rect(self.surface, colours.Colours.GREY, rect)
 
         if self.game.state == model.Game.GAME_PLAYING:
-
-            draw_text(self.surface,"  Scores  ({0})  ".format(model.Game.STATE[self.game.state]),
+            draw_text(self.surface, "  Scores  ({0})  ".format(model.Game.STATE[self.game.state]),
                       pane_rect.centerx,
-                      ScoreView.TITLE_HEIGHT/2,
+                      ScoreView.TITLE_HEIGHT / 2,
                       size=ScoreView.HEADER_TEXT_SIZE,
-                      bg_colour = colours.Colours.GREY)
+                      bg_colour=colours.Colours.GREY)
 
         # Game to update current leaders so that we can highlight them
         self.game.calc_leaders()
 
         # Draw The players names at the top of the score view
-        x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
-        y = ScoreView.TITLE_HEIGHT + ScoreView.PADDING + ScoreView.HEADER_HEIGHT/2
+        x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH / 2
+        y = ScoreView.TITLE_HEIGHT + ScoreView.PADDING + ScoreView.HEADER_HEIGHT / 2
 
         for player in self.game.players:
             if player == self.game.current_player:
@@ -140,24 +155,23 @@ class ScoreView:
             else:
                 bg_colour = colours.Colours.BLUE
 
-            draw_text(self.surface,"  {0}  ".format(player.name), bg_colour=bg_colour, x=x,y=y)
+            draw_text(self.surface, "  {0}  ".format(player.name), bg_colour=bg_colour, x=x, y=y)
             x += ScoreView.HEADER_WIDTH + ScoreView.PADDING
 
-        y += ScoreView.HEADER_HEIGHT + ScoreView.PADDING*2
-
+        y += ScoreView.HEADER_HEIGHT + ScoreView.PADDING * 2
 
         # Print upper section scores
-        for i in range(1,7):
+        for i in range(1, 7):
 
-            x = ScoreView.PADDING + ScoreView.SCORE_WIDTH/2
+            x = ScoreView.PADDING + ScoreView.SCORE_WIDTH / 2
 
             score_type = "{0}'s".format(i)
-            draw_text(self.surface,x=x,y=y,msg="{0}'s".format(i),
+            draw_text(self.surface, x=x, y=y, msg="{0}'s".format(i),
                       fg_colour=colours.Colours.WHITE,
                       bg_colour=colours.Colours.BLUE,
-                      size = ScoreView.SCORE_TEXT_SIZE)
+                      size=ScoreView.SCORE_TEXT_SIZE)
 
-            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
+            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH / 2
 
             for player in self.game.players:
 
@@ -172,13 +186,12 @@ class ScoreView:
                         bg_colour = colours.Colours.BLUE
                         fg_colour = colours.Colours.BLACK
 
-
-                    draw_text(self.surface,msg = "{0}".format(score), x=x,y=y,
+                    draw_text(self.surface, msg="{0}".format(score), x=x, y=y,
                               bg_colour=bg_colour,
                               fg_colour=fg_colour,
-                              size = ScoreView.SCORE_TEXT_SIZE)
+                              size=ScoreView.SCORE_TEXT_SIZE)
                 else:
-                    draw_text(self.surface,msg = "-", x=x,y=y,
+                    draw_text(self.surface, msg="-", x=x, y=y,
                               bg_colour=colours.Colours.BLUE,
                               fg_colour=colours.Colours.WHITE,
                               size=ScoreView.SCORE_TEXT_SIZE)
@@ -200,15 +213,14 @@ class ScoreView:
 
         for score_type in lower_score_types:
 
-            x = ScoreView.PADDING + ScoreView.SCORE_WIDTH/2
+            x = ScoreView.PADDING + ScoreView.SCORE_WIDTH / 2
 
             draw_text(self.surface, msg="{0}".format(score_type), x=x, y=y,
                       bg_colour=colours.Colours.BLUE,
                       fg_colour=colours.Colours.WHITE,
                       size=ScoreView.SCORE_TEXT_SIZE)
 
-
-            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
+            x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH / 2
 
             for player in self.game.players:
 
@@ -229,7 +241,7 @@ class ScoreView:
                               size=ScoreView.SCORE_TEXT_SIZE)
 
                 else:
-                    draw_text(self.surface,msg = "-", x=x,y=y,
+                    draw_text(self.surface, msg="-", x=x, y=y,
                               bg_colour=colours.Colours.BLUE,
                               fg_colour=colours.Colours.WHITE,
                               size=ScoreView.SCORE_TEXT_SIZE)
@@ -238,61 +250,63 @@ class ScoreView:
 
             y += ScoreView.SCORE_HEIGHT + ScoreView.PADDING
 
-        #Print score table footer
-        x = ScoreView.PADDING + ScoreView.SCORE_WIDTH/2
+        # Print score table footer
+        x = ScoreView.PADDING + ScoreView.SCORE_WIDTH / 2
         y += ScoreView.PADDING
 
-        draw_text(self.surface,msg="TOTAL", x=x,y=y,
+        draw_text(self.surface, msg="TOTAL", x=x, y=y,
                   bg_colour=colours.Colours.BLUE,
                   fg_colour=colours.Colours.WHITE,
                   size=ScoreView.SCORE_TEXT_SIZE)
 
-        x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH/2
+        x = ScoreView.PADDING * 2 + ScoreView.SCORE_WIDTH + ScoreView.HEADER_WIDTH / 2
 
         for player in self.game.players:
 
             if player == self.game.current_player:
                 bg_colour = colours.Colours.GREEN
-                fg_colour=colours.Colours.WHITE
+                fg_colour = colours.Colours.WHITE
             elif player in self.game.winners:
                 bg_colour = colours.Colours.RED
-                fg_colour=colours.Colours.WHITE
+                fg_colour = colours.Colours.WHITE
             else:
                 bg_colour = colours.Colours.BLUE
-                fg_colour=colours.Colours.WHITE
+                fg_colour = colours.Colours.WHITE
 
             if player.name in self.game.player_scores.keys():
 
                 player_scores = self.game.player_scores[player.name]
                 score = sum(player_scores.values())
-                draw_text(self.surface,msg="  {0}  ".format(score),x=x,y=y,
+                draw_text(self.surface, msg="  {0}  ".format(score), x=x, y=y,
                           fg_colour=fg_colour,
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
             else:
-                draw_text(self.surface,msg="-",x=x,y=y,
+                draw_text(self.surface, msg="-", x=x, y=y,
                           fg_colour=fg_colour,
                           bg_colour=bg_colour,
                           size=ScoreView.SCORE_TEXT_SIZE)
 
             x += ScoreView.PADDING + ScoreView.HEADER_WIDTH
 
-class TurnView:
 
+class TurnView:
     DICE_WIDTH = 60
     DICE_HEIGHT = 60
     DICE_SPACING = 10
     HEADER_HEIGHT = 30
+    HEADER_BG_COLOUR = colours.Colours.GREY
+    HEADER_FG_COLOUR = colours.Colours.WHITE
+    HEADER_FONT_SIZE = 30
 
-    def __init__(self, width : int = 500, height : int = None):
+    def __init__(self, width: int = 500, height: int = None):
 
         if height is None:
             height = TurnView.HEADER_HEIGHT + TurnView.DICE_SPACING * 3 + TurnView.DICE_HEIGHT * 2
 
         self.surface = pygame.Surface((width, height))
 
-
-    def initialise(self, game : model.Game):
+    def initialise(self, game: model.Game):
 
         self.game = game
 
@@ -305,25 +319,30 @@ class TurnView:
 
         self.surface.fill(colours.Colours.RED)
 
-        rect = pygame.Rect(0,0,pane_rect.width,ScoreView.TITLE_HEIGHT)
-        pygame.draw.rect(self.surface, colours.Colours.GREY, rect)
+        rect = pygame.Rect(0, 0, pane_rect.width, TurnView.HEADER_HEIGHT)
+        pygame.draw.rect(self.surface, TurnView.HEADER_BG_COLOUR, rect)
 
         rolled_dice = pygame.sprite.Group()
         held_dice = pygame.sprite.Group()
 
         if self.game.state == model.Game.GAME_PLAYING:
 
-            draw_text(self.surface,"  Player {0}: {1}, roll {2}  ".format(self.game.current_player.name,
-                                                                        model.Turn.state_to_text[self.game.current_turn.state],
-                                                                        self.game.current_turn.rolls),
-                      self.surface.get_rect().centerx,
-                      TurnView.HEADER_HEIGHT/2)
+            draw_text(self.surface, "  Player {0}: {1}, roll {2}  ".format(self.game.current_player.name,
+                                                                           model.Turn.state_to_text[
+                                                                               self.game.current_turn.state],
+                                                                           self.game.current_turn.rolls),
+                      x=self.surface.get_rect().centerx,
+                      y=TurnView.HEADER_HEIGHT / 2,
+                      bg_colour=TurnView.HEADER_BG_COLOUR,
+                      fg_colour=TurnView.HEADER_FG_COLOUR,
+                      size=TurnView.HEADER_FONT_SIZE)
 
             x = TurnView.DICE_SPACING
             y = TurnView.HEADER_HEIGHT + TurnView.DICE_SPACING
 
             for dice in self.game.current_turn.current_roll:
-                dice_view = SpriteView(x=x, y=y, image_file_name = "dice" + str(dice) + ".png", width=TurnView.DICE_WIDTH, height = TurnView.DICE_HEIGHT)
+                dice_view = SpriteView(x=x, y=y, image_file_name="dice" + str(dice) + ".png", width=TurnView.DICE_WIDTH,
+                                       height=TurnView.DICE_HEIGHT)
                 rolled_dice.add(dice_view)
                 x = dice_view.rect.right + TurnView.DICE_SPACING
 
@@ -340,15 +359,13 @@ class TurnView:
             held_dice.draw(self.surface)
 
 
-
 class SpriteView(pygame.sprite.Sprite):
-
-    def __init__(self, x : int = 0, y : int = 0, width : int = None, height : int = None, image_file_name : str = None):
+    def __init__(self, x: int = 0, y: int = 0, width: int = None, height: int = None, image_file_name: str = None):
 
         super(SpriteView, self).__init__()
 
-        self._x=x
-        self._y=y
+        self._x = x
+        self._y = y
 
         self.image_file_name = image_file_name
 
@@ -360,12 +377,12 @@ class SpriteView(pygame.sprite.Sprite):
                 if height is None:
                     width = image.get_rect().width
                 else:
-                    width = int(image.get_rect().width * height/image.get_rect().height)
+                    width = int(image.get_rect().width * height / image.get_rect().height)
             if height is None:
                 if width is None:
                     height = image.get_rect().height
                 else:
-                    height = int(image.get_rect().height * width/image.get_rect().width)
+                    height = int(image.get_rect().height * width / image.get_rect().width)
 
             self.image = pygame.transform.smoothscale(image, (width, height))
             self.original_image = self.image.copy()
@@ -376,13 +393,12 @@ class SpriteView(pygame.sprite.Sprite):
 
 
 class ScorePickerView:
-
     TITLE_HEIGHT = 40
     TITLE_TEXT_SIZE = 30
     CHOICE_HEIGHT = 20
     CHOICE_TEXT_SIZE = 24
 
-    def __init__(self, width : int = 500, height : int = None):
+    def __init__(self, width: int = 500, height: int = None):
 
         self.game = None
 
@@ -391,23 +407,23 @@ class ScorePickerView:
 
         self.surface = pygame.Surface((width, height))
 
-    def initialise(self, game : model.Game):
+    def initialise(self, game: model.Game):
 
         self.game = game
 
     def draw(self):
 
         if self.game is None:
-            raise("No game set for Score Picker View!")
+            raise ("No game set for Score Picker View!")
 
         self.surface.fill(colours.Colours.BLACK)
 
         pane_rect = self.surface.get_rect()
 
-        y = ScorePickerView.TITLE_HEIGHT/2
+        y = ScorePickerView.TITLE_HEIGHT / 2
         x = pane_rect.centerx
 
-        draw_text(self.surface,msg="Pick a score for this turn:-", x=x,y=y,
+        draw_text(self.surface, msg="Pick a score for this turn:-", x=x, y=y,
                   size=ScorePickerView.TITLE_TEXT_SIZE)
 
         y = ScorePickerView.TITLE_HEIGHT + 10
@@ -415,52 +431,49 @@ class ScorePickerView:
         available_scores = sorted(self.game.available_scores())
         choice_number = 1
         for score in available_scores:
-            draw_text(self.surface,msg="{0}. {1}".format(choice_number, score), x=x,y=y,
-                  size=ScorePickerView.CHOICE_TEXT_SIZE)
+            draw_text(self.surface, msg="{0}. {1}".format(choice_number, score), x=x, y=y,
+                      size=ScorePickerView.CHOICE_TEXT_SIZE)
             choice_number += 1
-            y+=ScorePickerView.CHOICE_HEIGHT
+            y += ScorePickerView.CHOICE_HEIGHT
 
 
 class HighScoreTableView:
-
     TITLE_HEGHT = 24
     TITLE_TEXT_SIZE = 20
     SCORE_HEIGHT = 20
     SCORE_TEXT_SIZE = 20
 
-    def __init__(self, width : int, height : int = None):
+    def __init__(self, width: int, height: int = 500):
         self.hst = None
 
         self.surface = pygame.Surface((width, height))
 
-    def initialise(self, hst : utils.HighScoreTable):
+    def initialise(self, hst: utils.HighScoreTable):
         self.hst = hst
 
     def draw(self):
 
         if self.hst is None:
-            raise("No High Score Table to view!")
+            raise ("No High Score Table to view!")
 
         self.surface.fill(colours.Colours.BLACK)
 
         pane_rect = self.surface.get_rect()
 
-        y = ScorePickerView.TITLE_HEIGHT/2
+        y = ScorePickerView.TITLE_HEIGHT / 2
         x = pane_rect.centerx
 
-        draw_text(self.surface,msg="High Score Table", x=x,y=y,
+        draw_text(self.surface, msg="High Score Table", x=x, y=y,
                   size=ScorePickerView.TITLE_TEXT_SIZE)
 
         rank = 1
         for entry in self.hst.table:
-
-            y+= HighScoreTableView.SCORE_HEIGHT
+            y += HighScoreTableView.SCORE_HEIGHT
 
             name, score = entry
-            draw_text(self.surface, msg="{0}. {1} - {2}".format(rank,name,score), x=x, y=y,
+            draw_text(self.surface, msg="{0}. {1} - {2}".format(rank, name, score), x=x, y=y,
                       size=HighScoreTableView.SCORE_TEXT_SIZE)
             rank += 1
-
 
 
 def draw_text(surface, msg, x, y, size=32, fg_colour=colours.Colours.WHITE, bg_colour=colours.Colours.BLACK):
@@ -470,4 +483,3 @@ def draw_text(surface, msg, x, y, size=32, fg_colour=colours.Colours.WHITE, bg_c
     textpos.centerx = x
     textpos.centery = y
     surface.blit(text, textpos)
-
