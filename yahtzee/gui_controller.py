@@ -2,6 +2,7 @@ import pygame,os, sys
 from pygame.locals import *
 import yahtzee.model.game as model
 import yahtzee.view as view
+import yahtzee.utils as utils
 
 def main_loop():
 
@@ -45,7 +46,7 @@ def main_loop():
 
                 elif event.key == K_e:
                     try:
-                        game.end_turn()
+                        game.stop_rolling()
                     except Exception as err:
                         print(str(err))
 
@@ -73,6 +74,58 @@ def main_loop():
         FPSCLOCK.tick(30)
         frame.draw()
         frame.update()
+
+        if game.state != model.Game.GAME_READY and game.current_turn.state == model.Turn.LAST_ROLL_DONE:
+            try:
+                pane_rect = frame.surface.get_rect()
+                available_scores = sorted(game.available_scores())
+                choice = int(select_score_number(frame.surface, x = pane_rect.centerx, y = pane_rect.bottom - 30))
+                print("You chose {0}. {1}".format(choice, available_scores[choice-1]))
+                game.score_turn(available_scores[choice-1])
+                game.next_player()
+            except Exception as err:
+                print(str(err))
+
+def select_score_number(surface, x, y):
+
+    txtbx = utils.eztext.Input(maxlength=2, color=utils.Colours.WHITE, font=pygame.font.Font(None, 24),
+                         x=x,
+                         y=y,
+                         prompt='Choice? ',
+                         restricted = "0123456789")
+
+    choice = None
+
+    # create the pygame clock
+    clock = pygame.time.Clock()
+    # main loop!
+    loop = True
+    while loop:
+        # make sure the program is running at 30 fps
+        clock.tick(30)
+
+        # events for txtbx
+        events = pygame.event.get()
+        # process other events
+        for event in events:
+            # close it x button is pressed
+            if event.type == QUIT:
+                loop = False
+                break
+            elif event.type == KEYDOWN and event.key == K_RETURN:
+                print("Finished. Value={0}".format(txtbx.value))
+                choice = txtbx.value
+                loop = False
+                break
+
+        # update txtbx
+        txtbx.update(events)
+        # blit txtbx on the sceen
+        txtbx.draw(surface)
+        # refresh the display
+        pygame.display.flip()
+
+    return choice
 
 
 

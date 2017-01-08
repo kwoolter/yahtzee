@@ -74,6 +74,15 @@ class Game:
 
         self.current_turn.hold_all()
 
+    def stop_rolling(self):
+        if self.state != Game.GAME_PLAYING:
+            raise Exception("Game not in a state to score a turn!")
+
+        if self.current_turn.state != Turn.PLAYING:
+            raise Exception("Can't stop rolling as Turn not being played!")
+
+        self.current_turn.stop_rolling()
+
     def score_turn(self, chosen_score : str):
 
         if self.state != Game.GAME_PLAYING:
@@ -452,6 +461,9 @@ class Turn:
         '''Turn.end() - set the state of the turn to finished.'''
         logging.info("Player %s has ended their turn" % self.player.name)
         self.complete = True
+
+    def stop_rolling(self):
+        self.rolls = Turn.MAX_ROLLS
 
     def score(self):
         '''Turn.score() - Calculate all of the possible scores that can be achieved from the current rice roll.
