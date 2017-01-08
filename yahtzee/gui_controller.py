@@ -14,7 +14,7 @@ def main_loop():
     game = model.Game()
     game.add_player(model.Player("Rosie"))
     game.add_player(model.Player("Jack"))
-    game.add_player(model.Player("Keith"))
+    #game.add_player(model.Player("Keith"))
 
     frame = view.MainFrame("yahtzee", 600, 700)
     frame.initialise(game)
