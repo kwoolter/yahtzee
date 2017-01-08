@@ -387,7 +387,7 @@ class ScorePickerView:
 
         y = ScorePickerView.TITLE_HEIGHT + 10
 
-        available_scores = self.game.available_scores()
+        available_scores = sorted(self.game.available_scores())
         choice_number = 1
         for score in available_scores:
             draw_text(self.surface,msg="{0}. {1}".format(choice_number, score), x=x,y=y,
