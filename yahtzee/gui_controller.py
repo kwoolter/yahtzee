@@ -50,13 +50,6 @@ def main_loop():
                     except Exception as err:
                         print(str(err))
 
-                elif event.key == K_s:
-                    try:
-                        pick_a_score = True
-                        #game.score_turn("1's")
-                    except Exception as err:
-                        print(str(err))
-
                 elif event.key in HOLD_KEYS:
                     dice_number = HOLD_KEYS.index(event.key) + 1
                     try:
