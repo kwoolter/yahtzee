@@ -24,6 +24,8 @@ def main_loop():
 
     FPSCLOCK = pygame.time.Clock()
 
+    pygame.time.set_timer(USEREVENT + 1, 1000)
+
 
     # main game loop
     while True:
@@ -31,6 +33,8 @@ def main_loop():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == USEREVENT + 1:
+                frame.tick()
             elif event.type == KEYUP:
                 if event.key == K_SPACE:
                     try:
@@ -40,7 +44,7 @@ def main_loop():
 
                 elif event.key == K_q:
                     try:
-                        if game.state == model.Game.GAME_OVER:
+                        if game.state in (model.Game.GAME_OVER, model.Game.GAME_READY):
                             pygame.quit()
                             sys.exit()
                         else:

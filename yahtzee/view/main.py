@@ -15,7 +15,7 @@ def main():
 
     # Set-up the game window
     pygame.display.set_caption('YAHTZEE')
-    filename = RESOURCES_DIR + "a.jpg"
+    filename = RESOURCES_DIR + "yahtzee.jpg"
     image = pygame.image.load(filename)
     image = pygame.transform.scale(image, (32, 32))
     pygame.display.set_icon(image)

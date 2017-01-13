@@ -1,4 +1,4 @@
-import pygame, os, sys
+import pygame, os, sys, random
 from pygame.locals import *
 import yahtzee.utils.colours as colours
 import yahtzee.model.game as model
@@ -38,9 +38,15 @@ class MainFrame:
         self.score_picker.initialise(self.game)
         self.hst.initialise(self.game.hst)
 
+    def tick(self):
+        self.score_view.tick()
+        self.turn_view.tick()
+        self.hst.tick()
+
+
     def draw(self):
 
-        self.surface.fill(colours.Colours.GREY)
+        self.surface.fill(colours.Colours.BLACK)
 
         x = MainFrame.PANE_PADDING
         y = MainFrame.PANE_PADDING
@@ -60,9 +66,28 @@ class MainFrame:
             self.score_picker.draw()
             self.surface.blit(self.score_picker.surface, (x, y))
 
+        pane_rect = self.surface.get_rect()
+
+        if self.game.state in (model.Game.GAME_OVER, model.Game.GAME_READY):
+
+            y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
+
+            self.hst.draw()
+            self.surface.blit(self.hst.surface, (x, y))
+
+            y = pane_rect.bottom - 30
+            draw_text(self.surface, "  Press 'Space Bar' to play or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
+
+        if self.game.state == model.Game.GAME_READY:
+
+            filename = MainFrame.RESOURCES_DIR + "logo.jpg"
+            image = pygame.image.load(filename)
+            image = pygame.transform.scale(image, (self.surface.get_rect().width, 180))
+            self.surface.blit(image,(0,0))
+
         if self.game.state == model.Game.GAME_OVER:
-            self.surface.fill(colours.Colours.BLACK)
-            pane_rect = self.surface.get_rect()
+
+            self.turn_view.surface.fill(colours.Colours.BLACK)
 
             y = 25
             draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50)
@@ -81,13 +106,6 @@ class MainFrame:
                     y += 20
                     draw_text(self.surface, "{0} with a score of {1}".format(player, sum(self.game.player_scores[player].values())),
                               x=pane_rect.centerx, y=y, size=20)
-
-            y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
-            self.hst.draw()
-            self.surface.blit(self.hst.surface, (x, y))
-
-            y = pane_rect.bottom - 30
-            draw_text(self.surface, "  Press 'Space Bar' to play again or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
 
     def update(self):
         pygame.display.update()
@@ -119,6 +137,9 @@ class ScoreView:
 
     def initialise(self, game: model.Game):
         self.game = game
+
+    def tick(self):
+        pass
 
     def draw(self):
 
@@ -306,10 +327,15 @@ class TurnView:
             height = TurnView.HEADER_HEIGHT + TurnView.DICE_SPACING * 3 + TurnView.DICE_HEIGHT * 2
 
         self.surface = pygame.Surface((width, height))
+        self.current_rotation = 0
 
     def initialise(self, game: model.Game):
 
         self.game = game
+
+    def tick(self):
+        #self.current_rotation += 5
+        pass
 
     def draw(self):
 
@@ -323,10 +349,11 @@ class TurnView:
         rect = pygame.Rect(0, 0, pane_rect.width, TurnView.HEADER_HEIGHT)
         pygame.draw.rect(self.surface, TurnView.HEADER_BG_COLOUR, rect)
 
-        rolled_dice = pygame.sprite.Group()
-        held_dice = pygame.sprite.Group()
 
         if self.game.state == model.Game.GAME_PLAYING:
+
+            self.held_dice = pygame.sprite.Group()
+            self.rolled_dice = pygame.sprite.Group()
 
             draw_text(self.surface, "  Player {0}: {1}, roll {2}  ".format(self.game.current_player.name,
                                                                            model.Turn.state_to_text[
@@ -344,7 +371,8 @@ class TurnView:
             for dice in self.game.current_turn.current_roll:
                 dice_view = SpriteView(x=x, y=y, image_file_name="dice" + str(dice) + ".png", width=TurnView.DICE_WIDTH,
                                        height=TurnView.DICE_HEIGHT)
-                rolled_dice.add(dice_view)
+
+                self.rolled_dice.add(dice_view)
                 x = dice_view.rect.right + TurnView.DICE_SPACING
 
             x = TurnView.DICE_SPACING
@@ -353,11 +381,12 @@ class TurnView:
             for dice in self.game.current_turn.slots:
                 dice_view = SpriteView(x=x, y=y, image_file_name="dice" + str(dice) + ".png",
                                        width=TurnView.DICE_WIDTH, height=TurnView.DICE_HEIGHT)
-                rolled_dice.add(dice_view)
+                dice_view.rotate(self.current_rotation)
+                self.held_dice.add(dice_view)
                 x = dice_view.rect.right + TurnView.DICE_SPACING
 
-            rolled_dice.draw(self.surface)
-            held_dice.draw(self.surface)
+            self.rolled_dice.draw(self.surface)
+            self.held_dice.draw(self.surface)
 
 
 class SpriteView(pygame.sprite.Sprite):
@@ -391,6 +420,11 @@ class SpriteView(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = int(self._x)
         self.rect.y = int(self._y)
+
+    def rotate(self, rotation : int):
+        loc = self.original_image.get_rect().center
+        self.image = pygame.transform.rotate(self.original_image, rotation)
+        self.image.get_rect().center = loc
 
 
 class ScorePickerView:
@@ -439,6 +473,7 @@ class ScorePickerView:
 
 
 class HighScoreTableView:
+
     TITLE_HEGHT = 24
     TITLE_TEXT_SIZE = 20
     SCORE_HEIGHT = 20
@@ -446,11 +481,32 @@ class HighScoreTableView:
 
     def __init__(self, width: int, height: int = 500):
         self.hst = None
+        self.dice_group = None
 
         self.surface = pygame.Surface((width, height))
 
     def initialise(self, hst: utils.HighScoreTable):
         self.hst = hst
+
+        self.random_dice_generate()
+
+    def random_dice_generate(self):
+
+        dice_count = int(self.surface.get_rect().width/(TurnView.DICE_WIDTH + TurnView.DICE_SPACING))
+
+        self.dice_group = pygame.sprite.Group()
+
+        for i in range(dice_count + 1):
+            dice = SpriteView(x = (i*TurnView.DICE_WIDTH + TurnView.DICE_SPACING),
+                              y = (self.surface.get_rect().bottom - TurnView.DICE_HEIGHT),
+                              width=TurnView.DICE_WIDTH,
+                              height=TurnView.DICE_HEIGHT,
+                              image_file_name="dice{0}.png".format(random.randint(1,6)))
+
+            self.dice_group.add(dice)
+
+    def tick(self):
+        self.random_dice_generate()
 
     def draw(self):
 
@@ -458,6 +514,8 @@ class HighScoreTableView:
             raise ("No High Score Table to view!")
 
         self.surface.fill(colours.Colours.BLACK)
+
+        self.dice_group.draw(self.surface)
 
         pane_rect = self.surface.get_rect()
 
