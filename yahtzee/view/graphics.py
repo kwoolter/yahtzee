@@ -68,6 +68,11 @@ class MainFrame:
 
         pane_rect = self.surface.get_rect()
 
+        if self.game.state == model.Game.GAME_PLAYING:
+
+            y = pane_rect.bottom - 20
+            draw_text(self.surface, "1-6:Hold    F1-F6:Unhold    R:Roll    E:End    Q:Quit", x=pane_rect.centerx, y=y, size=30)
+
         if self.game.state in (model.Game.GAME_OVER, model.Game.GAME_READY):
 
             y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
@@ -75,19 +80,19 @@ class MainFrame:
             self.hst.draw()
             self.surface.blit(self.hst.surface, (x, y))
 
-            y = pane_rect.bottom - 30
+            y = pane_rect.bottom - 20
             draw_text(self.surface, "  Press 'Space Bar' to play or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
 
         if self.game.state == model.Game.GAME_READY:
 
             filename = MainFrame.RESOURCES_DIR + "logo.jpg"
             image = pygame.image.load(filename)
-            image = pygame.transform.scale(image, (self.surface.get_rect().width, 180))
+            image = pygame.transform.scale(image, (self.surface.get_rect().width, 190))
             self.surface.blit(image,(0,0))
 
         if self.game.state == model.Game.GAME_OVER:
 
-            self.turn_view.surface.fill(colours.Colours.BLACK)
+            pygame.draw.rect(self.surface, colours.Colours.BLACK, (0,0,self.surface.get_width(), 190))
 
             y = 25
             draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50)
@@ -131,7 +136,7 @@ class ScoreView:
                      ScoreView.PADDING + \
                      ScoreView.HEADER_HEIGHT + \
                      ScoreView.PADDING + \
-                     (ScoreView.SCORE_HEIGHT + ScoreView.PADDING) * 16 + ScoreView.PADDING
+                     (ScoreView.SCORE_HEIGHT + ScoreView.PADDING) * 16 + ScoreView.PADDING * 2
 
         self.surface = pygame.Surface((width, height))
 

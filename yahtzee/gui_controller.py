@@ -16,7 +16,7 @@ def main_loop():
     game.add_player(model.Player("Jack"))
     game.add_player(model.Player("Keith"))
 
-    frame = view.MainFrame("yahtzee", 600, 700)
+    frame = view.MainFrame("yahtzee", 570, 620)
     frame.initialise(game)
 
     score_picker = view.ScorePickerView(300)
@@ -86,7 +86,7 @@ def main_loop():
             try:
                 pane_rect = frame.surface.get_rect()
                 available_scores = sorted(game.available_scores())
-                choice = int(select_score_number(frame.surface, x = pane_rect.centerx, y = pane_rect.bottom - 30))
+                choice = int(select_score_number(frame.surface, x = pane_rect.centerx - 40, y = pane_rect.bottom - 60))
                 print("You chose {0}. {1}".format(choice, available_scores[choice-1]))
                 game.score_turn(available_scores[choice-1])
                 game.next_player()
@@ -124,8 +124,8 @@ def select_score_number(surface, x, y):
         for event in events:
             # close it x button is pressed
             if event.type == QUIT:
-                loop = False
-                break
+                pygame.quit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_RETURN:
                 print("Finished. Value={0}".format(txtbx.value))
                 choice = txtbx.value
