@@ -22,6 +22,8 @@ class MainFrame:
         self.hst = HighScoreTableView(width=width - MainFrame.PANE_PADDING * 2,
                                       height=self.score_view.surface.get_height())
 
+        self.game_over = GameOverView(width = width, height = self.turn_view.surface.get_height())
+
     def initialise(self, game: model.Game):
         self.game = game
 
@@ -37,43 +39,53 @@ class MainFrame:
         self.score_view.initialise(self.game)
         self.score_picker.initialise(self.game)
         self.hst.initialise(self.game.hst)
+        self.game_over.inititalise(self.game)
 
     def tick(self):
         self.score_view.tick()
         self.turn_view.tick()
         self.hst.tick()
+        self.game_over.tick()
 
 
     def draw(self):
 
         self.surface.fill(colours.Colours.BLACK)
 
-        x = MainFrame.PANE_PADDING
-        y = MainFrame.PANE_PADDING
-
-        self.turn_view.draw()
-        self.surface.blit(self.turn_view.surface, (x, y))
-
-        y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
-
-        self.score_view.draw()
-        self.surface.blit(self.score_view.surface, (x, y))
-
-        y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
-
-        if self.game.current_turn is not None and \
-                        self.game.current_turn.state == model.Turn.LAST_ROLL_DONE:
-            self.score_picker.draw()
-            self.surface.blit(self.score_picker.surface, (x, y))
-
         pane_rect = self.surface.get_rect()
 
+        x=MainFrame.PANE_PADDING
+
         if self.game.state == model.Game.GAME_PLAYING:
+
+
+            y = MainFrame.PANE_PADDING
+
+            self.turn_view.draw()
+            self.surface.blit(self.turn_view.surface, (x, y))
+
+            y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
+
+            self.score_view.draw()
+            self.surface.blit(self.score_view.surface, (x, y))
+
+            y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
+
+            if self.game.current_turn is not None and \
+                            self.game.current_turn.state == model.Turn.LAST_ROLL_DONE:
+                self.score_picker.draw()
+                self.surface.blit(self.score_picker.surface, (x, y))
 
             y = pane_rect.bottom - 20
             draw_text(self.surface, "1-6:Hold    F1-F6:Unhold    R:Roll    E:End    Q:Quit", x=pane_rect.centerx, y=y, size=30)
 
-        if self.game.state in (model.Game.GAME_OVER, model.Game.GAME_READY):
+
+        if self.game.state == model.Game.GAME_READY:
+
+            filename = MainFrame.RESOURCES_DIR + "logo.jpg"
+            image = pygame.image.load(filename)
+            image = pygame.transform.scale(image, (self.surface.get_rect().width, 190))
+            self.surface.blit(image,(0,0))
 
             y = self.turn_view.surface.get_rect().bottom + MainFrame.PANE_PADDING
 
@@ -83,34 +95,19 @@ class MainFrame:
             y = pane_rect.bottom - 20
             draw_text(self.surface, "  Press 'Space Bar' to play or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
 
-        if self.game.state == model.Game.GAME_READY:
-
-            filename = MainFrame.RESOURCES_DIR + "logo.jpg"
-            image = pygame.image.load(filename)
-            image = pygame.transform.scale(image, (self.surface.get_rect().width, 190))
-            self.surface.blit(image,(0,0))
 
         if self.game.state == model.Game.GAME_OVER:
 
-            pygame.draw.rect(self.surface, colours.Colours.BLACK, (0,0,self.surface.get_width(), 190))
+            self.game_over.draw()
+            self.surface.blit(self.game_over.surface, (0, 0))
 
-            y = 25
-            draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50)
+            y = self.game_over.surface.get_rect().bottom + MainFrame.PANE_PADDING
 
-            y += 35
-            draw_text(self.surface, "  Winners:  ", x=pane_rect.centerx, y=y, size=30, fg_colour=colours.Colours.GOLD)
-            for player in self.game.winners:
-                y += 30
-                draw_text(self.surface, "{0} with a score of {1}".format(player.name, self.game.winning_score),
-                          x=pane_rect.centerx, y=y, size=30)
+            self.hst.draw()
+            self.surface.blit(self.hst.surface, (x, y))
 
-            y += 35
-            draw_text(self.surface, "  Final Scores:  ", x=pane_rect.centerx, y=y, size=30)
-            for player in self.game.player_scores.keys():
-                if player not in self.game.winners:
-                    y += 20
-                    draw_text(self.surface, "{0} with a score of {1}".format(player, sum(self.game.player_scores[player].values())),
-                              x=pane_rect.centerx, y=y, size=20)
+            y = pane_rect.bottom - 20
+            draw_text(self.surface, "  Press 'Space Bar' to play or 'Q' to quit.  ", x=pane_rect.centerx, y=y, size=30)
 
     def update(self):
         pygame.display.update()
@@ -540,6 +537,76 @@ class HighScoreTableView:
                       size=HighScoreTableView.SCORE_TEXT_SIZE)
             rank += 1
 
+
+class GameOverView:
+    def __init__(self, width: int, height: int = 500):
+
+        self.game = None
+        self.dice_group = None
+
+        self.surface = pygame.Surface((width, height))
+
+    def inititalise(self, game : model.Game):
+        self.game = game
+        self.random_dice_generate()
+
+    def tick(self):
+        self.random_dice_generate()
+
+    def random_dice_generate(self):
+
+        dice_count = int(self.surface.get_rect().width/(TurnView.DICE_WIDTH + TurnView.DICE_SPACING))
+
+        self.dice_group = pygame.sprite.Group()
+
+        pane_rect = self.surface.get_rect()
+
+        dice = SpriteView(x = int(pane_rect.width/4- TurnView.DICE_WIDTH/2),
+                          y = 100,
+                          width=TurnView.DICE_WIDTH,
+                          height=TurnView.DICE_HEIGHT,
+                          image_file_name="dice{0}.png".format(random.randint(1,6)))
+
+        self.dice_group.add(dice)
+
+        dice = SpriteView(x = int(pane_rect.width*3/4 - TurnView.DICE_WIDTH/2),
+                          y = 100,
+                          width=TurnView.DICE_WIDTH,
+                          height=TurnView.DICE_HEIGHT,
+                          image_file_name="dice{0}.png".format(random.randint(1,6)))
+
+        self.dice_group.add(dice)
+
+
+    def draw(self):
+        if self.game is None:
+            raise ("No game to view!")
+
+        pane_rect = self.surface.get_rect()
+
+        self.surface.fill(colours.Colours.BLACK)
+
+        self.dice_group.draw(self.surface)
+
+        y=30
+
+        draw_text(self.surface, "  G A M E    O V E R  ", x=pane_rect.centerx, y=y, size=50,fg_colour=colours.Colours.RED)
+
+        y += 35
+        draw_text(self.surface, "  Winners:  ", x=pane_rect.centerx, y=y, size=30, fg_colour=colours.Colours.GOLD)
+        for player in self.game.winners:
+            y += 30
+            draw_text(self.surface, "{0} with a score of {1}".format(player.name, self.game.winning_score),
+                      x=pane_rect.centerx, y=y, size=30, fg_colour=colours.Colours.GOLD)
+
+        y += 35
+        draw_text(self.surface, "  Final Scores:  ", x=pane_rect.centerx, y=y, size=30)
+        for player in self.game.player_scores.keys():
+            if player not in self.game.winners:
+                y += 20
+                draw_text(self.surface,
+                          "{0} with a score of {1}".format(player, sum(self.game.player_scores[player].values())),
+                          x=pane_rect.centerx, y=y, size=20)
 
 def draw_text(surface, msg, x, y, size=32, fg_colour=colours.Colours.WHITE, bg_colour=colours.Colours.BLACK):
     font = pygame.font.Font(None, size)

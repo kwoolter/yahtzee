@@ -1,8 +1,15 @@
-<html>
-<body>
-<h1>Welcome to PyYahtzee</h1>
-<p>By kwoolter</p>
-<p>(c) 2017</p>
+#Welcome to PyYahtzee
+By kwoolter :monkey: :copyright: 2017
+
+##Requirements
+- Python 3.2 - https://www.python.org/downloads/release/python-326/
+- PyGame for Python 3.2 - http://pygame.org/ftp/pygame-1.9.2a0.win32-py3.2.msi
+
+##What's New
+- Added pygame GUI as an alternative to CLI
+- Run _gui_controller.py_ to launch GUI version
+
+
 <h2>Getting Started</h2>
 <p>
 <ul>
@@ -16,6 +23,7 @@
 </ul>
 </p>
 <h2>Structure</h2>
+<h3>Text Version</h3>
 <p>The game is structured using the <strong>Model-View-Controller</strong> paradigm:-<p>
 <ul>
 <li><strong>Model</strong> - the "game.py" file in the "model" module holds the core of the game e.g. Player,
@@ -26,5 +34,11 @@
 <a href="https://docs.python.org/3/library/cmd.html">cmd module</a>.</li>
 </ul>
 <p>The "utils" module has various utilities that are used by the game e.g. HighScoreTable, is_numeric(), pick(), confirm()</p>
-</body>
-</html>
+<h3>Graphics Version</h3>
+<p>The game is structured using the <strong>Model-View-Controller</strong> paradigm:-<p>
+<ul>
+<li><strong>Model</strong> - the same "game.py" as the text version.</li>
+<li><strong>View</strong> - the "graphics.py" file in the "view" module holds the classes that display
+ various aspects of the game e.g.the scorecard, the turn, etc.</li>
+<li><strong>Controller</strong> - the "gui_controller.py" file has the GUI controller main loop.</li>
+</ul>
