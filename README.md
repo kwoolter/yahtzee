@@ -56,6 +56,7 @@ The game is structured using the <strong>Model-View-Controller</strong> paradigm
 <td colspan="2" align="center"><strong>Text Version</strong></td>
 </tr>
 <tr>
+<td>
 <img height=100 width=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee3.PNG" alt="game3">
 </td>
 <td>
