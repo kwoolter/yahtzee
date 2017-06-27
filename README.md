@@ -10,14 +10,14 @@ PyYahtzee By kwoolter :monkey: :copyright: 2017
 - Run `gui_controller.py` to launch GUI version
 
 ## Getting Started
+- Written in Python 3.
+- Run `run.py` to start the game.
+- Type "help" to find out about the commands to play the game e.g. "help", "help scores", etc.
+- 1 to 4 players can play the game.
+- The rules of Yahtzee can be found [here](http://www.yahtzee.org.uk/rules.html)
+- Colours work if the game is run inside PyCharm IDE.
+- A high score table is saved as "PyYahtzee.hst".
 
-    - Written in Python 3.
-    - Run `run.py` to start the game.
-    - Type "help" to find out about the commands to play the game e.g. "help", "help scores", etc.
-    - 1 to 4 players can play the game.
-    - The rules of Yahtzee can be found [here](http://www.yahtzee.org.uk/rules.html)
-    - Colours work if the game is run inside PyCharm IDE.
-    - A high score table is saved as "PyYahtzee.hst".
 ## Structure
 ### Text Version
 The game is structured using the **Model-View-Controller** paradigm:-
@@ -43,9 +43,10 @@ The game is structured using the <strong>Model-View-Controller</strong> paradigm
 <table>
 <tr>
 <td>
-<img height=300 width=300 src="https://github.com/kwoolter/TowerApp/blob/master/towerrpg/screenshots/Tower3.PNG" alt="game3">
+<img height=400 width=300 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee1.PNG" alt="game1">
 </td>
 <td>
+<img height=400 width=300 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee2.PNG" alt="game2">
 </td>
 </tr>
 </table>
