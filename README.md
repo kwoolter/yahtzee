@@ -42,6 +42,9 @@ The game is structured using the <strong>Model-View-Controller</strong> paradigm
 
 <table>
 <tr>
+<td colspan="2" align="center"><strong>Graphics Version</strong></td>
+</tr>
+<tr>
 <td>
 <img height=400 width=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee1.PNG" alt="game1">
 </td>
@@ -50,7 +53,9 @@ The game is structured using the <strong>Model-View-Controller</strong> paradigm
 </td>
 </tr>
 <tr>
-<td>
+<td colspan="2" align="center"><strong>Text Version</strong></td>
+</tr>
+<tr>
 <img height=100 width=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee3.PNG" alt="game3">
 </td>
 <td>
