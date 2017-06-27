@@ -49,6 +49,14 @@ The game is structured using the <strong>Model-View-Controller</strong> paradigm
 <img height=400 width=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee2.PNG" alt="game2">
 </td>
 </tr>
+<tr>
+<td>
+<img height=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee3.PNG" alt="game3">
+</td>
+<td>
+<img height=400 src="https://github.com/kwoolter/yahtzee/blob/master/yahtzee/view/screenshots/yahtzee4.PNG" alt="game4">
+</td>
+</tr>
 </table>
 
 

@@ -1,5 +1,5 @@
 import yahtzee.model as model
-import yahtzee.view as view
+import yahtzee.view.game_text_view as view
 import yahtzee.utils as utils
 import logging, cmd
 
